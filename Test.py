@@ -1,8 +1,7 @@
 from sudoku_db import create_database, save_board, get_board_by_id
 from sudoku_solver import validate_sudoku_multithreaded, solve_sudoku
-from sudoku_db import save_board
 
-# Example Sudoku board
+# Example Sudoku board (0 represents empty cells)
 board = [
     [5, 3, 0, 0, 7, 0, 0, 0, 0],
     [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -15,8 +14,11 @@ board = [
     [0, 0, 0, 0, 8, 0, 0, 7, 9]
 ]
 
-# Save the board to the database
-save_board(board, is_valid=True, is_solved=False)  # Initially marked as valid but not solved
+# Ensure the database is created and the table is set up
+create_database()
+
+# Save the board to the database (Initially marked as valid but not solved)
+save_board(board, is_valid=True, is_solved=False)
 
 def main(board_id):
     # Retrieve the board from the database
@@ -41,6 +43,5 @@ def main(board_id):
         save_board(board, is_valid=False, is_solved=False)
 
 if __name__ == "__main__":
-    create_database()  # Ensure the database is created when running the script
     # Example: Assuming you have a board with ID 1 in the database
     main(1)

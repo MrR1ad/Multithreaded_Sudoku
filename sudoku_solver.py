@@ -1,6 +1,5 @@
 import threading
 from queue import Queue
-import json
 
 # Function to check if a number can be placed in a cell
 def is_valid(board, row, col, num):
