@@ -37,14 +37,15 @@ def solve_sudoku(board):
     return True
 
 # Validator function for multithreading
-def validate_section(queue, result):
+def validate_section(queue, result, lock):
     while not queue.empty():
         section = queue.get()
         nums = set()
         for num in section:
             if num != 0:
                 if num in nums:
-                    result[0] = False
+                    with lock:
+                        result[0] = False
                     return
                 nums.add(num)
         queue.task_done()
@@ -53,6 +54,7 @@ def validate_section(queue, result):
 def validate_sudoku_multithreaded(board):
     queue = Queue()
     result = [True]
+    lock = threading.Lock()  # Lock to ensure thread-safe modification of result
 
     # Add rows to the queue
     for row in board:
@@ -65,16 +67,14 @@ def validate_sudoku_multithreaded(board):
     # Add subgrids to the queue
     for box_row in range(3):
         for box_col in range(3):
-            queue.put([
-                board[row][col]
-                for row in range(box_row * 3, (box_row + 1) * 3)
-                for col in range(box_col * 3, (box_col + 1) * 3)
-            ])
+            queue.put([board[row][col]
+                       for row in range(box_row * 3, (box_row + 1) * 3)
+                       for col in range(box_col * 3, (box_col + 1) * 3)])
 
     # Create and start threads
     threads = []
     for _ in range(9):
-        thread = threading.Thread(target=validate_section, args=(queue, result))
+        thread = threading.Thread(target=validate_section, args=(queue, result, lock))
         threads.append(thread)
         thread.start()
 
